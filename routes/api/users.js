@@ -6,7 +6,10 @@ const nodemailer = require("nodemailer");
 
 const Token = require("../../models/token");
 const User = require("../../models/user");
-const { validateRegisterInput } = require("../../validations/user");
+const {
+  validateRegisterInput,
+  validateVerificationInput
+} = require("../../validations/user");
 
 // @route   POST /api/users/register
 // @desc    Register new user
@@ -79,6 +82,51 @@ router.post("/register", (req, res) => {
             .catch(err => res.status(500).send());
         });
       });
+    })
+    .catch(err => res.status(500).send());
+});
+
+// @route   POST /api/users/verification
+// @desc    Confirm email address
+// @access  Public
+router.post("/verification", (req, res) => {
+  const errors = validateVerificationInput(req.body);
+
+  if (Object.keys(errors).length > 0) {
+    return res.status(400).send(errors);
+  }
+
+  Token.findOne({ token: req.body.token })
+    .then(token => {
+      if (!token) {
+        errors.token = "Token is invalid or has expired";
+        return res.status(400).send(errors);
+      }
+
+      User.findOne({ _id: token.user_id })
+        .then(user => {
+          if (!user) {
+            errors.user = "User does not exist";
+            return res.status(400).send(errors);
+          }
+
+          if (user.verified) {
+            errors.verification = "This account has already been verified";
+            return res.status(400).send(errors);
+          }
+
+          user.verified = true;
+
+          user
+            .save()
+            .then(user =>
+              res.send({
+                success: "You have successfully verified your account"
+              })
+            )
+            .catch(err => res.status(500).send());
+        })
+        .catch(err => res.status(500).send());
     })
     .catch(err => res.status(500).send());
 });

@@ -26,4 +26,16 @@ const validateRegisterInput = data => {
   return errors;
 };
 
-module.exports = { validateRegisterInput };
+const validateVerificationInput = data => {
+  const errors = {};
+
+  const token = typeof data.token === "string" ? data.token.trim() : "";
+
+  if (validator.isEmpty(token)) {
+    errors.token = "Verification token is required";
+  }
+
+  return errors;
+};
+
+module.exports = { validateRegisterInput, validateVerificationInput };
