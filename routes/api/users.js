@@ -2,14 +2,54 @@ const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const express = require("express");
 const router = express.Router();
+const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 
 const Token = require("../../models/token");
 const User = require("../../models/user");
 const {
+  validateLoginInput,
   validateRegisterInput,
   validateVerificationInput
 } = require("../../validations/user");
+
+// @route   POST /api/users/login
+// @desc    Log in existing user
+// @access  Public
+router.post("/login", (req, res) => {
+  const errors = validateLoginInput(req.body);
+
+  if (Object.keys(errors).length > 0) {
+    return res.status(400).send(errors);
+  }
+
+  const email = req.body.email.toLowerCase();
+
+  User.findOne({ email })
+    .then(user => {
+      if (!user) {
+        errors.email = "User does not exist";
+        return res.status(400).send(errors);
+      }
+
+      bcrypt.compare(req.body.password, user.password, (err, match) => {
+        if (!match) {
+          errors.password = "Password is incorrect";
+          return res.status(400).send(errors);
+        }
+
+        if (!user.verified) {
+          errors.verification = "Account is not verified";
+          return res.status(400).send(errors);
+        }
+
+        const token = jwt.sign({ user_id: user._id }, process.env.JWT_SECRET);
+
+        res.send({ token });
+      });
+    })
+    .catch(err => res.status(500).send());
+});
 
 // @route   POST /api/users/register
 // @desc    Register new user
