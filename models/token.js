@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const TokenSchema = new mongoose.Schema({
   createdAt: {
     default: Date.now,
-    expires: 60, // Change to 86400 (24 hours)
+    expires: 86400,
     type: Date
   },
   token: {

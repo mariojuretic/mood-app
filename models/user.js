@@ -9,10 +9,6 @@ const UserSchema = new mongoose.Schema({
     required: true,
     type: String
   },
-  username: {
-    required: true,
-    type: String
-  },
   verified: {
     default: false,
     type: Boolean
