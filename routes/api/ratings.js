@@ -35,6 +35,7 @@ router.get("/", authenticate, (req, res) => {
   const errors = {};
 
   Rating.find({ user_id: req.user._id })
+    .sort({ createdAt: -1 })
     .then(ratings => res.send(ratings))
     .catch(err => res.status(500).send());
 });

@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const RatingSchema = new mongoose.Schema({
+  createdAt: {
+    default: Date.now,
+    type: Date
+  },
   user_id: {
     ref: "User",
     required: true,
