@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import axios from "axios";
+import classnames from "classnames";
 import "./Register.css";
 
 class Register extends Component {
@@ -26,10 +28,15 @@ class Register extends Component {
       password: this.state.password
     };
 
-    console.log(newUser);
+    axios
+      .post("/api/users/register", newUser)
+      .then(res => console.log(res.data))
+      .catch(err => this.setState({ errors: err.response.data }));
   }
 
   render() {
+    const { errors } = this.state;
+
     return (
       <div className="register">
         <div className="container">
@@ -40,22 +47,32 @@ class Register extends Component {
                 <div className="form-group">
                   <input
                     type="text"
-                    className="form-control"
+                    className={classnames("form-control", {
+                      "is-invalid": errors.email
+                    })}
                     placeholder="Email address"
                     name="email"
                     value={this.state.email}
                     onChange={this.onChange}
                   />
+                  {errors.email && (
+                    <div className="invalid-feedback">{errors.email}</div>
+                  )}
                 </div>
                 <div className="form-group">
                   <input
                     type="password"
-                    className="form-control"
+                    className={classnames("form-control", {
+                      "is-invalid": errors.password
+                    })}
                     placeholder="Password"
                     name="password"
                     value={this.state.password}
                     onChange={this.onChange}
                   />
+                  {errors.password && (
+                    <div className="invalid-feedback">{errors.password}</div>
+                  )}
                 </div>
                 <input
                   type="submit"
