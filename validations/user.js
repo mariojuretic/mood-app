@@ -48,6 +48,22 @@ const validateRegisterInput = data => {
   return errors;
 };
 
+const validateResendInput = data => {
+  const errors = {};
+
+  const email = typeof data.email === "string" ? data.email.trim() : "";
+
+  if (!validator.isEmail(email)) {
+    errors.email = "Email is invalid";
+  }
+
+  if (validator.isEmpty(email)) {
+    errors.email = "Email is required";
+  }
+
+  return errors;
+};
+
 const validateVerificationInput = data => {
   const errors = {};
 
@@ -63,5 +79,6 @@ const validateVerificationInput = data => {
 module.exports = {
   validateLoginInput,
   validateRegisterInput,
+  validateResendInput,
   validateVerificationInput
 };

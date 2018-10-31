@@ -10,6 +10,7 @@ const User = require("../../models/user");
 const {
   validateLoginInput,
   validateRegisterInput,
+  validateResendInput,
   validateVerificationInput
 } = require("../../validations/user");
 
@@ -110,7 +111,7 @@ router.post("/register", (req, res) => {
                       return res.status(500).send();
                     }
 
-                    return res.send({
+                    res.send({
                       success: `Verification email has been sent to ${
                         user.email
                       }`
@@ -165,6 +166,68 @@ router.post("/verification", (req, res) => {
               })
             )
             .catch(err => res.status(500).send());
+        })
+        .catch(err => res.status(500).send());
+    })
+    .catch(err => res.status(500).send());
+});
+
+// @route   POST /api/users/verification/resend
+// @desc    Resend confirmation email
+// @access  Public
+router.post("/verification/resend", (req, res) => {
+  const errors = validateResendInput(req.body);
+
+  if (Object.keys(errors).length > 0) {
+    return res.status(400).send(errors);
+  }
+
+  const email = req.body.email.toLowerCase();
+
+  User.findOne({ email })
+    .then(user => {
+      if (!user) {
+        errors.email = "User does not exist";
+        return res.status(400).send(errors);
+      }
+
+      if (user.verified) {
+        errors.verification = "This account has already been verified";
+        return res.status(400).send(errors);
+      }
+
+      const newToken = new Token({
+        token: crypto.randomBytes(16).toString("hex"),
+        user_id: user._id
+      });
+
+      newToken
+        .save()
+        .then(token => {
+          const transporter = nodemailer.createTransport({
+            service: "Sendgrid",
+            auth: {
+              pass: process.env.SENDGRID_PASS,
+              user: process.env.SENDGRID_USER
+            }
+          });
+
+          const mailOptions = {
+            from: "noreply@mariojuretic.com",
+            subject: "Account Verification Token",
+            text: token.token,
+            to: user.email
+          };
+
+          transporter.sendMail(mailOptions, err => {
+            if (err) {
+              return res.status(500).send();
+            }
+
+            res.send({
+              success: `Verification email has been sent to ${user.email}`
+            });
+          });
         })
         .catch(err => res.status(500).send());
     })
