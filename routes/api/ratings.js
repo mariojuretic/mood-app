@@ -28,4 +28,15 @@ router.post("/", authenticate, (req, res) => {
     .catch(err => res.status(500).send());
 });
 
+// @route   GET /api/ratings
+// @desc    Fetch all ratings
+// @access  Private
+router.get("/", authenticate, (req, res) => {
+  const errors = {};
+
+  Rating.find({ user_id: req.user._id })
+    .then(ratings => res.send(ratings))
+    .catch(err => res.status(500).send());
+});
+
 module.exports = router;
