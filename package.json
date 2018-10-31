@@ -7,12 +7,16 @@
   "author": "Mario Juretić",
   "license": "MIT",
   "scripts": {
+    "client-install": "cd client && yarn install",
     "start": "node server.js",
-    "server": "nodemon server.js"
+    "server": "nodemon server.js",
+    "client": "cd client && yarn start",
+    "dev": "concurrently \"yarn run server\" \"yarn run client\""
   },
   "dependencies": {
     "bcryptjs": "2.4.3",
     "body-parser": "1.18.3",
+    "concurrently": "4.0.1",
     "express": "4.16.4",
     "jsonwebtoken": "8.3.0",
     "mongoose": "5.3.7",
