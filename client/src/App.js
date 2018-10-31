@@ -5,6 +5,7 @@ import jwt_decode from "jwt-decode";
 import store from "./store";
 import { setCurrentUser } from "./actions/authActions";
 
+import Navbar from "./components/layout/Navbar";
 import Landing from "./components/pages/Landing";
 import NotFound from "./components/pages/NotFound";
 import Register from "./components/auth/Register";
@@ -22,12 +23,15 @@ class App extends Component {
     return (
       <Provider store={store}>
         <Router>
-          <Switch>
-            <Route exact path="/" component={Landing} />
-            <Route exact path="/register" component={Register} />
-            <Route exact path="/login" component={Login} />
-            <Route component={NotFound} />
-          </Switch>
+          <div className="App">
+            <Navbar />
+            <Switch>
+              <Route exact path="/" component={Landing} />
+              <Route exact path="/register" component={Register} />
+              <Route exact path="/login" component={Login} />
+              <Route component={NotFound} />
+            </Switch>
+          </div>
         </Router>
       </Provider>
     );

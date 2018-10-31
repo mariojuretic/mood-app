@@ -12,7 +12,7 @@ const authenticate = (req, res, next) => {
     return res.status(401).send();
   }
 
-  User.findOne({ _id: decoded.user_id })
+  User.findOne({ _id: decoded._id })
     .then(user => {
       if (!user) {
         return res.status(401).send();

@@ -38,3 +38,9 @@ export const setCurrentUser = decoded => {
     payload: decoded
   };
 };
+
+export const logoutUser = () => dispatch => {
+  localStorage.removeItem("authToken");
+  setAuthToken(false);
+  dispatch(setCurrentUser({}));
+};

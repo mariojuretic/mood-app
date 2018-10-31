@@ -44,7 +44,10 @@ router.post("/login", (req, res) => {
           return res.status(400).send(errors);
         }
 
-        const token = jwt.sign({ user_id: user._id }, process.env.JWT_SECRET);
+        const token = jwt.sign(
+          { _id: user._id, email: user.email },
+          process.env.JWT_SECRET
+        );
 
         res.send({ token });
       });
